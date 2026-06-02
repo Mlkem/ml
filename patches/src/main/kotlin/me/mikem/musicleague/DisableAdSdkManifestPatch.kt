@@ -1,9 +1,32 @@
 package me.mikem.musicleague
 
-import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.resourcePatch
 import org.w3c.dom.Document
 import org.w3c.dom.Element
+
+private const val ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
+
+private fun Element.androidAttribute(name: String): String {
+    return getAttributeNS(ANDROID_NAMESPACE, name).ifBlank { getAttribute("android:$name") }
+}
+
+private fun Element.setAndroidAttribute(name: String, value: String) {
+    if (hasAttributeNS(ANDROID_NAMESPACE, name)) {
+        setAttributeNS(ANDROID_NAMESPACE, "android:$name", value)
+    } else {
+        setAttribute("android:$name", value)
+    }
+}
+
+private fun Document.elements(tagName: String): List<Element> {
+    val nodes = getElementsByTagName(tagName)
+    return buildList {
+        for (i in 0 until nodes.length) {
+            val node = nodes.item(i)
+            if (node is Element) add(node)
+        }
+    }
+}
 
 @Suppress("unused")
 val disableAdSdkManifestPatch = resourcePatch(
@@ -14,20 +37,6 @@ val disableAdSdkManifestPatch = resourcePatch(
     compatibleWith(MUSIC_LEAGUE)
 
     execute {
-        val androidNamespace = "http://schemas.android.com/apk/res/android"
-
-        fun Element.androidAttribute(name: String): String = getAttributeNS(androidNamespace, name)
-
-        fun Document.elements(tagName: String): List<Element> {
-            val nodes = getElementsByTagName(tagName)
-            return buildList {
-                for (i in 0 until nodes.length) {
-                    val node = nodes.item(i)
-                    if (node is Element) add(node)
-                }
-            }
-        }
-
         val adClassPrefixes = listOf(
             "com.google.android.gms.ads.",
             "com.inmobi.ads.",
@@ -68,60 +77,46 @@ val disableAdSdkManifestPatch = resourcePatch(
             "google_analytics_default_allow_ad_personalization_signals",
         )
 
-        var changed = 0
-
         document("AndroidManifest.xml").use { document ->
-            // Remove Android ad ID and Privacy Sandbox ad-services permissions.
             for (permission in document.elements("uses-permission")) {
                 if (permission.androidAttribute("name") in adPermissions) {
                     permission.parentNode.removeChild(permission)
-                    changed++
                 }
             }
 
-            // Remove optional Android Privacy Sandbox ads extension library.
             for (library in document.elements("uses-library")) {
                 if (library.androidAttribute("name") == "android.ext.adservices") {
                     library.parentNode.removeChild(library)
-                    changed++
                 }
             }
 
-            // Remove ad SDK activities, services, providers, and receivers.
             for (tagName in listOf("activity", "service", "provider", "receiver")) {
                 for (component in document.elements(tagName)) {
                     val name = component.androidAttribute("name")
                     if (adClassPrefixes.any { name.startsWith(it) }) {
                         component.parentNode.removeChild(component)
-                        changed++
                     }
                 }
             }
 
-            // Remove ad-specific manifest metadata, including nested AndroidX Startup metadata.
             for (metaData in document.elements("meta-data")) {
                 val name = metaData.androidAttribute("name")
                 when {
                     name in adMetaValuesToSet -> {
-                        metaData.setAttributeNS(androidNamespace, "android:value", adMetaValuesToSet.getValue(name))
-                        changed++
+                        metaData.setAndroidAttribute("value", adMetaValuesToSet.getValue(name))
                     }
 
                     name in adMetaNamesToRemove -> {
                         metaData.parentNode.removeChild(metaData)
-                        changed++
                     }
 
                     name in adConsentMetaNamesToFalse -> {
-                        metaData.setAttributeNS(androidNamespace, "android:value", "false")
-                        changed++
+                        metaData.setAndroidAttribute("value", "false")
                     }
                 }
             }
         }
 
-        if (changed == 0) {
-            throw PatchException("No ad SDK manifest entries were changed. The target APK may not match the inspected build.")
-        }
+        // Do not fail if the target APK is already modified or uses a different ad stack.
     }
 }

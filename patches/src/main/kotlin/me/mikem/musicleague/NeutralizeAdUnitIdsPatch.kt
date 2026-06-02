@@ -1,6 +1,5 @@
 package me.mikem.musicleague
 
-import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.resourcePatch
 
 private fun ByteArray.replaceAscii(search: String, replacement: String): Pair<ByteArray, Int> {
@@ -93,7 +92,8 @@ val neutralizeAdUnitIdsPatch = resourcePatch(
         }
 
         if (replacements == 0) {
-            throw PatchException("No bundled AdMob IDs were found in assets/index.android.bundle")
+            // Already patched, or this build stores the ad IDs elsewhere.
+            return@execute
         }
 
         bundleFile.writeBytes(data)
