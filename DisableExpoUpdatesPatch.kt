@@ -1,14 +1,21 @@
-# APK findings
+# Ad patch findings
 
-- Manifest package: `com.musicleague.app`
-- Version: `1.4.9`, versionCode `357`
-- compileSdk: 35, targetSdk: 35, minSdk: 24
-- Expo runtimeVersion: `1.4.9`
-- Expo project/update URL: `https://u.expo.dev/c0a173c1-8772-4ecc-ab1d-821cd556380d`
-- Expo channel header: `main`
-- Local bundle: `assets/index.android.bundle`
-- Local bundle file type: Hermes JavaScript bytecode, version 96
-- App config: `assets/app.config`
-- Embedded update manifest commit time: 2026-05-25 06:30:53 UTC
+The inspected APK has a large mediation stack in `AndroidManifest.xml`, not a single ad provider.
 
-Important implication: patching native Java/Kotlin classes will not reach most app behavior. The app-specific UI and business logic is in Hermes bytecode.
+Detected manifest components / metadata include:
+
+- Google Mobile Ads / AdMob
+- Unity Ads
+- IronSource / LevelPlay
+- InMobi
+- Moloco
+- Vungle
+- Pangle / ByteDance OpenAds
+- Facebook Audience Network
+- MBridge / Mintegral
+- Android Privacy Sandbox ad-services permissions
+- Google Advertising ID permission
+
+The Hermes bundle also contains AdMob app/ad unit IDs. The patch named `Neutralize bundled ad unit IDs` replaces the real and Google sample IDs with same-length non-serving placeholders so the Hermes bytecode string table is not resized.
+
+Important limitation: this does not decompile and rewrite the JS logic. It prevents/neutralizes native ad SDK initialization paths and bundled ad unit IDs. If the app UI still shows a "watch ads" button, that text/logic is inside `assets/index.android.bundle` and would need a Hermes-level patch or a rebuilt app bundle from the original source.
