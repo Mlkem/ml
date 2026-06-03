@@ -2,8 +2,8 @@ package me.mikem.musicleague
 
 import app.morphe.patcher.patch.resourcePatch
 
-private fun ByteArray.replaceAscii(search: String, replacement: String): Pair<ByteArray, Int> {
-    require(search.length == replacement.length) {
+private fun ByteArray.replaceAsciiText(search: String, replacement: String): Pair<ByteArray, Int> {
+    require(search.toByteArray(Charsets.US_ASCII).size == replacement.toByteArray(Charsets.US_ASCII).size) {
         "Replacement must be exactly the same byte length. Search=$search Replacement=$replacement"
     }
 
@@ -15,6 +15,7 @@ private fun ByteArray.replaceAscii(search: String, replacement: String): Pair<By
 
     while (i <= output.size - needle.size) {
         var matched = true
+
         for (j in needle.indices) {
             if (output[i + j] != needle[j]) {
                 matched = false
@@ -34,7 +35,74 @@ private fun ByteArray.replaceAscii(search: String, replacement: String): Pair<By
     return output to count
 }
 
-private fun neutralizeCaAppPubId(id: String): String {
+private fun blankSameLength(value: String): String = " ".repeat(value.length)
+
+@Suppress("unused")
+val neutralizePremiumPromptsPatch = resourcePatch(
+    name = "Neutralize premium and reward-ad prompts",
+    description = "Removes bundled premium upsell and reward-ad modal/banner wording from the Hermes bundle with same-length replacements.",
+    default = true,
+) {
+    compatibleWith(MUSIC_LEAGUE)
+
+    execute {
+        val replacements = listOf(
+            // Home premium banner.
+            "Unlock the Best Music League Experience" to blankSameLength("Unlock the Best Music League Experience"),
+            "Play Without Ads for hours, months or all year" to blankSameLength("Play Without Ads for hours, months or all year"),
+            "Premium subscriptions turn off all ads, provide league data and early access to new features" to blankSameLength("Premium subscriptions turn off all ads, provide league data and early access to new features"),
+            "Go Premium" to blankSameLength("Go Premium"),
+            "GO PREMIUM" to blankSameLength("GO PREMIUM"),
+
+            // Rewarded-ad / subscription popup.
+            "Six Hours with Zero" to blankSameLength("Six Hours with Zero"),
+            "Months with Zero Ads" to blankSameLength("Months with Zero Ads"),
+            "Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)" to blankSameLength("Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)"),
+            "Six hours of ad-free gameplay. ~90 seconds of ads" to blankSameLength("Six hours of ad-free gameplay. ~90 seconds of ads"),
+            "hours of uninterrupted, ad-free gameplay." to blankSameLength("hours of uninterrupted, ad-free gameplay."),
+            "Reward granted! Enjoy **Six** Hours with **Zero** Ads" to blankSameLength("Reward granted! Enjoy **Six** Hours with **Zero** Ads"),
+
+            // Buttons.
+            "Watch Rewarded Ads" to blankSameLength("Watch Rewarded Ads"),
+            "WATCH REWARDED ADS" to blankSameLength("WATCH REWARDED ADS"),
+            "WATCH ADS WITHOUT REWARD" to blankSameLength("WATCH ADS WITHOUT REWARD"),
+            "WATCH ADS without REWARD" to blankSameLength("WATCH ADS without REWARD"),
+            "WATCH ADS FOR REWARD" to blankSameLength("WATCH ADS FOR REWARD"),
+            "WATCH ADS for REWARD" to blankSameLength("WATCH ADS for REWARD"),
+            "Subscribe NOW" to blankSameLength("Subscribe NOW"),
+            "SUBSCRIBE" to blankSameLength("SUBSCRIBE"),
+
+            // Subscription copy.
+            "Unlock the Best Music League" to blankSameLength("Unlock the Best Music League"),
+            "Zero ads" to blankSameLength("Zero ads"),
+            "Download league-by-league data" to blankSameLength("Download league-by-league data"),
+            "Early access to new features" to blankSameLength("Early access to new features"),
+            "Monthly" to blankSameLength("Monthly"),
+            "Annual" to blankSameLength("Annual"),
+            "Save 31%" to blankSameLength("Save 31%"),
+
+            // Possible adjacent keys / labels.
+            "Zero ads_card_description" to blankSameLength("Zero ads_card_description"),
+            "subscription_bullet_1" to blankSameLength("subscription_bullet_1"),
+            "subscription_bullet_2" to blankSameLength("subscription_bullet_2"),
+            "subscription_bullet_3" to blankSameLength("subscription_bullet_3"),
+        )
+
+        val bundleFile = get("assets/index.android.bundle")
+        var data = bundleFile.readBytes()
+        var total = 0
+
+        for ((search, replacement) in replacements) {
+            val result = data.replaceAsciiText(search, replacement)
+            data = result.first
+            total += result.second
+        }
+
+        if (total > 0) {
+            bundleFile.writeBytes(data)
+        }
+    }
+}private fun neutralizeCaAppPubId(id: String): String {
     val separatorIndex = id.indexOfAny(charArrayOf('/', '~'))
     require(separatorIndex > 0) { "Unsupported AdMob identifier format: $id" }
 
