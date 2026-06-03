@@ -17,16 +17,38 @@ private fun Element.setAndroidAttr(name: String, value: String) {
     }
 }
 
+private fun Element.removeAndroidAttr(name: String) {
+    if (hasAttributeNS(ANDROID_NS, name)) {
+        removeAttributeNS(ANDROID_NS, name)
+    }
+    if (hasAttribute("android:$name")) {
+        removeAttribute("android:$name")
+    }
+}
+
 @Suppress("unused")
 val disableExpoUpdatesPatch = resourcePatch(
-    name = "Disable Expo updates",
-    description = "Prevents Expo OTA updates from overriding patched bundled application code.",
+    name = "Disable Expo updates and backup restore",
+    description = "Forces the app to use the bundled local Hermes asset instead of cached Expo OTA updates or restored app data.",
     default = true,
 ) {
     compatibleWith(MUSIC_LEAGUE)
 
     execute {
         document("AndroidManifest.xml").use { document ->
+            val applications = document.getElementsByTagName("application")
+
+            if (applications.length > 0) {
+                val application = applications.item(0)
+
+                if (application is Element) {
+                    application.setAndroidAttr("allowBackup", "false")
+                    application.setAndroidAttr("fullBackupOnly", "false")
+                    application.removeAndroidAttr("fullBackupContent")
+                    application.removeAndroidAttr("dataExtractionRules")
+                }
+            }
+
             val metaDataNodes = document.getElementsByTagName("meta-data")
 
             for (i in 0 until metaDataNodes.length) {
@@ -47,14 +69,14 @@ val disableExpoUpdatesPatch = resourcePatch(
                     }
 
                     "expo.modules.updates.EXPO_UPDATE_URL" -> {
-                        // Keep the node present but neutral. Some Expo builds expect the key to exist.
                         node.setAndroidAttr("value", "")
+                    }
+
+                    "expo.modules.updates.UPDATES_CONFIGURATION_REQUEST_HEADERS_KEY" -> {
+                        node.setAndroidAttr("value", "{}")
                     }
                 }
             }
-
-            // Do not throw if Morphe is run against an already-modified APK or a build where
-            // Expo Updates metadata has been stripped. The absence of these keys is already safe.
         }
     }
 }
