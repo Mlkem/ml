@@ -2,10 +2,10 @@ group = "me.mikem"
 
 patches {
     about {
-        name = "Music League patches compatible with Morphe"
-        description = "Personal patch bundle for Music League."
-        source = "https://github.com/YOUR_GITHUB_USER/music-league-patches"
-        author = "Michael MacDonald"
+        name = "Music League Patches"
+        description = "Private Music League patch bundle for Morphe."
+        source = "https://github.com/Mlkem/ml"
+        author = "MDM"
         contact = "na"
         website = "na"
         license = "Private / personal use"
