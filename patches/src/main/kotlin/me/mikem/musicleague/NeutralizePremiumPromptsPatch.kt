@@ -3,10 +3,8 @@ package me.mikem.musicleague
 import app.morphe.patcher.patch.resourcePatch
 import java.nio.charset.Charset
 
-private fun ByteArray.replaceBytes(search: ByteArray, replacement: ByteArray): Pair<ByteArray, Int> {
-    require(search.size == replacement.size) {
-        "Replacement must be exactly the same byte length."
-    }
+private fun ByteArray.mlPremiumReplaceBytes(search: ByteArray, replacement: ByteArray): Pair<ByteArray, Int> {
+    require(search.size == replacement.size) { "Replacement must be exactly the same byte length." }
 
     val output = copyOf()
     var count = 0
@@ -14,14 +12,12 @@ private fun ByteArray.replaceBytes(search: ByteArray, replacement: ByteArray): P
 
     while (i <= output.size - search.size) {
         var matched = true
-
         for (j in search.indices) {
             if (output[i + j] != search[j]) {
                 matched = false
                 break
             }
         }
-
         if (matched) {
             System.arraycopy(replacement, 0, output, i, replacement.size)
             count++
@@ -34,22 +30,16 @@ private fun ByteArray.replaceBytes(search: ByteArray, replacement: ByteArray): P
     return output to count
 }
 
-private fun ByteArray.replaceEncodedText(
-    search: String,
-    replacement: String,
-    charset: Charset,
-): Pair<ByteArray, Int> {
+private fun ByteArray.mlPremiumReplaceEncodedText(search: String, replacement: String, charset: Charset): Pair<ByteArray, Int> {
     val searchBytes = search.toByteArray(charset)
     val replacementBytes = replacement.toByteArray(charset)
-
     require(searchBytes.size == replacementBytes.size) {
         "Replacement must be exactly the same encoded byte length. Search=$search Replacement=$replacement"
     }
-
-    return replaceBytes(searchBytes, replacementBytes)
+    return mlPremiumReplaceBytes(searchBytes, replacementBytes)
 }
 
-private fun blankSameLength(value: String): String = " ".repeat(value.length)
+private fun mlPremiumBlank(value: String): String = " ".repeat(value.length)
 
 @Suppress("unused")
 val neutralizePremiumPromptsPatch = resourcePatch(
@@ -61,67 +51,15 @@ val neutralizePremiumPromptsPatch = resourcePatch(
 
     execute {
         val replacements = listOf(
-            // Exact main banner strings still showing.
-            "Unlock the Best Music League Experience" to blankSameLength("Unlock the Best Music League Experience"),
-            "Play Without Ads for hours, months or all year" to blankSameLength("Play Without Ads for hours, months or all year"),
-            "Premium subscriptions turn off all ads, provide league data and early access to new features" to blankSameLength("Premium subscriptions turn off all ads, provide league data and early access to new features"),
-            "GO PREMIUM" to blankSameLength("GO PREMIUM"),
-            "Go Premium" to blankSameLength("Go Premium"),
-
-            // Main banner fragments, in case the UI is composed from smaller strings.
-            "Unlock the Best Music League" to blankSameLength("Unlock the Best Music League"),
-            "Best Music League Experience" to blankSameLength("Best Music League Experience"),
-            "Play Without Ads" to blankSameLength("Play Without Ads"),
-            "for hours, months or all year" to blankSameLength("for hours, months or all year"),
-            "Premium subscriptions turn off all ads" to blankSameLength("Premium subscriptions turn off all ads"),
-            "provide league data" to blankSameLength("provide league data"),
-            "early access to new features" to blankSameLength("early access to new features"),
-
-            // Exact remaining reward banner strings.
-            "Enjoy Six Hours with Zero Ads" to blankSameLength("Enjoy Six Hours with Zero Ads"),
-            "Enjoy six hours with zero ads" to blankSameLength("Enjoy six hours with zero ads"),
-            "enjoy six hours with zero ads" to blankSameLength("enjoy six hours with zero ads"),
-            "Six hours of ad-free gameplay. ~90 seconds" to blankSameLength("Six hours of ad-free gameplay. ~90 seconds"),
-            "Six hours of ad-free gameplay. ~90 seconds of ads" to blankSameLength("Six hours of ad-free gameplay. ~90 seconds of ads"),
-
-            // Reward banner fragments.
-            "Six Hours with Zero Ads" to blankSameLength("Six Hours with Zero Ads"),
-            "Six Hours with Zero" to blankSameLength("Six Hours with Zero"),
-            "six hours with zero ads" to blankSameLength("six hours with zero ads"),
-            "six hours with zero" to blankSameLength("six hours with zero"),
-            "Zero Ads" to blankSameLength("Zero Ads"),
-            "zero ads" to blankSameLength("zero ads"),
-            "ad-free gameplay" to blankSameLength("ad-free gameplay"),
-            "~90 seconds" to blankSameLength("~90 seconds"),
-
-            // Rewarded-ad popup / card copy.
-            "Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)" to blankSameLength("Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)"),
-            "hours of uninterrupted, ad-free gameplay." to blankSameLength("hours of uninterrupted, ad-free gameplay."),
-            "Reward granted! Enjoy **Six** Hours with **Zero** Ads" to blankSameLength("Reward granted! Enjoy **Six** Hours with **Zero** Ads"),
-
-            // Buttons.
-            "Watch Rewarded Ads" to blankSameLength("Watch Rewarded Ads"),
-            "WATCH REWARDED ADS" to blankSameLength("WATCH REWARDED ADS"),
-            "WATCH ADS WITHOUT REWARD" to blankSameLength("WATCH ADS WITHOUT REWARD"),
-            "WATCH ADS without REWARD" to blankSameLength("WATCH ADS without REWARD"),
-            "WATCH ADS FOR REWARD" to blankSameLength("WATCH ADS FOR REWARD"),
-            "WATCH ADS for REWARD" to blankSameLength("WATCH ADS for REWARD"),
-            "Subscribe NOW" to blankSameLength("Subscribe NOW"),
-            "SUBSCRIBE" to blankSameLength("SUBSCRIBE"),
-
-            // Subscription bullets.
-            "Zero ads" to blankSameLength("Zero ads"),
-            "Download league-by-league data" to blankSameLength("Download league-by-league data"),
-            "Early access to new features" to blankSameLength("Early access to new features"),
-            "Monthly" to blankSameLength("Monthly"),
-            "Annual" to blankSameLength("Annual"),
-            "Save 31%" to blankSameLength("Save 31%"),
-
-            // Possible adjacent labels / keys.
-            "Zero ads_card_description" to blankSameLength("Zero ads_card_description"),
-            "subscription_bullet_1" to blankSameLength("subscription_bullet_1"),
-            "subscription_bullet_2" to blankSameLength("subscription_bullet_2"),
-            "subscription_bullet_3" to blankSameLength("subscription_bullet_3"),
+            "Unlock the Best Music League Experience" to mlPremiumBlank("Unlock the Best Music League Experience"),
+            "Play Without Ads for hours, months or all year" to mlPremiumBlank("Play Without Ads for hours, months or all year"),
+            "Premium subscriptions turn off all ads, provide league data and early access to new features" to mlPremiumBlank("Premium subscriptions turn off all ads, provide league data and early access to new features"),
+            "GO PREMIUM" to mlPremiumBlank("GO PREMIUM"),
+            "Go Premium" to mlPremiumBlank("Go Premium"),
+            "Enjoy Six Hours with Zero Ads" to mlPremiumBlank("Enjoy Six Hours with Zero Ads"),
+            "Six hours of ad-free gameplay. ~90 seconds" to mlPremiumBlank("Six hours of ad-free gameplay. ~90 seconds"),
+            "Six hours of ad-free gameplay. ~90 seconds of ads" to mlPremiumBlank("Six hours of ad-free gameplay. ~90 seconds of ads"),
+            "Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)" to mlPremiumBlank("Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)")
         )
 
         val bundleFile = get("assets/index.android.bundle")
@@ -129,17 +67,15 @@ val neutralizePremiumPromptsPatch = resourcePatch(
         var total = 0
 
         for ((search, replacement) in replacements) {
-            val utf8Result = data.replaceEncodedText(search, replacement, Charsets.UTF_8)
+            val utf8Result = data.mlPremiumReplaceEncodedText(search, replacement, Charsets.UTF_8)
             data = utf8Result.first
             total += utf8Result.second
 
-            val utf16Result = data.replaceEncodedText(search, replacement, Charsets.UTF_16LE)
+            val utf16Result = data.mlPremiumReplaceEncodedText(search, replacement, Charsets.UTF_16LE)
             data = utf16Result.first
             total += utf16Result.second
         }
 
-        if (total > 0) {
-            bundleFile.writeBytes(data)
-        }
+        if (total > 0) bundleFile.writeBytes(data)
     }
 }

@@ -3,27 +3,23 @@ package me.mikem.musicleague
 import app.morphe.patcher.patch.resourcePatch
 import org.w3c.dom.Element
 
-private const val ANDROID_NS = "http://schemas.android.com/apk/res/android"
+private const val EXPO_ANDROID_NS = "http://schemas.android.com/apk/res/android"
 
-private fun Element.androidAttr(name: String): String {
-    return getAttributeNS(ANDROID_NS, name).ifBlank { getAttribute("android:$name") }
+private fun Element.expoAndroidAttr(name: String): String {
+    return getAttributeNS(EXPO_ANDROID_NS, name).ifBlank { getAttribute("android:$name") }
 }
 
-private fun Element.setAndroidAttr(name: String, value: String) {
-    if (hasAttributeNS(ANDROID_NS, name)) {
-        setAttributeNS(ANDROID_NS, "android:$name", value)
+private fun Element.setExpoAndroidAttr(name: String, value: String) {
+    if (hasAttributeNS(EXPO_ANDROID_NS, name)) {
+        setAttributeNS(EXPO_ANDROID_NS, "android:$name", value)
     } else {
         setAttribute("android:$name", value)
     }
 }
 
-private fun Element.removeAndroidAttr(name: String) {
-    if (hasAttributeNS(ANDROID_NS, name)) {
-        removeAttributeNS(ANDROID_NS, name)
-    }
-    if (hasAttribute("android:$name")) {
-        removeAttribute("android:$name")
-    }
+private fun Element.removeExpoAndroidAttr(name: String) {
+    if (hasAttributeNS(EXPO_ANDROID_NS, name)) removeAttributeNS(EXPO_ANDROID_NS, name)
+    if (hasAttribute("android:$name")) removeAttribute("android:$name")
 }
 
 @Suppress("unused")
@@ -42,10 +38,10 @@ val disableExpoUpdatesPatch = resourcePatch(
                 val application = applications.item(0)
 
                 if (application is Element) {
-                    application.setAndroidAttr("allowBackup", "false")
-                    application.setAndroidAttr("fullBackupOnly", "false")
-                    application.removeAndroidAttr("fullBackupContent")
-                    application.removeAndroidAttr("dataExtractionRules")
+                    application.setExpoAndroidAttr("allowBackup", "false")
+                    application.setExpoAndroidAttr("fullBackupOnly", "false")
+                    application.removeExpoAndroidAttr("fullBackupContent")
+                    application.removeExpoAndroidAttr("dataExtractionRules")
                 }
             }
 
@@ -55,26 +51,12 @@ val disableExpoUpdatesPatch = resourcePatch(
                 val node = metaDataNodes.item(i)
                 if (node !is Element) continue
 
-                when (node.androidAttr("name")) {
-                    "expo.modules.updates.ENABLED" -> {
-                        node.setAndroidAttr("value", "false")
-                    }
-
-                    "expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" -> {
-                        node.setAndroidAttr("value", "NEVER")
-                    }
-
-                    "expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" -> {
-                        node.setAndroidAttr("value", "0")
-                    }
-
-                    "expo.modules.updates.EXPO_UPDATE_URL" -> {
-                        node.setAndroidAttr("value", "")
-                    }
-
-                    "expo.modules.updates.UPDATES_CONFIGURATION_REQUEST_HEADERS_KEY" -> {
-                        node.setAndroidAttr("value", "{}")
-                    }
+                when (node.expoAndroidAttr("name")) {
+                    "expo.modules.updates.ENABLED" -> node.setExpoAndroidAttr("value", "false")
+                    "expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" -> node.setExpoAndroidAttr("value", "NEVER")
+                    "expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" -> node.setExpoAndroidAttr("value", "0")
+                    "expo.modules.updates.EXPO_UPDATE_URL" -> node.setExpoAndroidAttr("value", "")
+                    "expo.modules.updates.UPDATES_CONFIGURATION_REQUEST_HEADERS_KEY" -> node.setExpoAndroidAttr("value", "{}")
                 }
             }
         }
