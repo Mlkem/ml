@@ -61,27 +61,41 @@ val neutralizePremiumPromptsPatch = resourcePatch(
 
     execute {
         val replacements = listOf(
-            // Main screen premium banner.
+            // Exact main banner strings still showing.
             "Unlock the Best Music League Experience" to blankSameLength("Unlock the Best Music League Experience"),
-            "Unlock the Best Music League" to blankSameLength("Unlock the Best Music League"),
             "Play Without Ads for hours, months or all year" to blankSameLength("Play Without Ads for hours, months or all year"),
             "Premium subscriptions turn off all ads, provide league data and early access to new features" to blankSameLength("Premium subscriptions turn off all ads, provide league data and early access to new features"),
             "GO PREMIUM" to blankSameLength("GO PREMIUM"),
             "Go Premium" to blankSameLength("Go Premium"),
 
-            // Six-hour reward banner / modal.
+            // Main banner fragments, in case the UI is composed from smaller strings.
+            "Unlock the Best Music League" to blankSameLength("Unlock the Best Music League"),
+            "Best Music League Experience" to blankSameLength("Best Music League Experience"),
+            "Play Without Ads" to blankSameLength("Play Without Ads"),
+            "for hours, months or all year" to blankSameLength("for hours, months or all year"),
+            "Premium subscriptions turn off all ads" to blankSameLength("Premium subscriptions turn off all ads"),
+            "provide league data" to blankSameLength("provide league data"),
+            "early access to new features" to blankSameLength("early access to new features"),
+
+            // Exact remaining reward banner strings.
             "Enjoy Six Hours with Zero Ads" to blankSameLength("Enjoy Six Hours with Zero Ads"),
             "Enjoy six hours with zero ads" to blankSameLength("Enjoy six hours with zero ads"),
             "enjoy six hours with zero ads" to blankSameLength("enjoy six hours with zero ads"),
+            "Six hours of ad-free gameplay. ~90 seconds" to blankSameLength("Six hours of ad-free gameplay. ~90 seconds"),
+            "Six hours of ad-free gameplay. ~90 seconds of ads" to blankSameLength("Six hours of ad-free gameplay. ~90 seconds of ads"),
+
+            // Reward banner fragments.
             "Six Hours with Zero Ads" to blankSameLength("Six Hours with Zero Ads"),
-            "six hours with zero ads" to blankSameLength("six hours with zero ads"),
             "Six Hours with Zero" to blankSameLength("Six Hours with Zero"),
+            "six hours with zero ads" to blankSameLength("six hours with zero ads"),
+            "six hours with zero" to blankSameLength("six hours with zero"),
             "Zero Ads" to blankSameLength("Zero Ads"),
             "zero ads" to blankSameLength("zero ads"),
+            "ad-free gameplay" to blankSameLength("ad-free gameplay"),
+            "~90 seconds" to blankSameLength("~90 seconds"),
 
-            // Rewarded-ad popup.
+            // Rewarded-ad popup / card copy.
             "Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)" to blankSameLength("Receive hours of ad-free gameplay as thanks for watching ~90 seconds of ads (usually less!)"),
-            "Six hours of ad-free gameplay. ~90 seconds of ads" to blankSameLength("Six hours of ad-free gameplay. ~90 seconds of ads"),
             "hours of uninterrupted, ad-free gameplay." to blankSameLength("hours of uninterrupted, ad-free gameplay."),
             "Reward granted! Enjoy **Six** Hours with **Zero** Ads" to blankSameLength("Reward granted! Enjoy **Six** Hours with **Zero** Ads"),
 
