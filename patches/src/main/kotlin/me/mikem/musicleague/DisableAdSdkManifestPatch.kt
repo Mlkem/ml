@@ -58,10 +58,9 @@ val disableAdSdkManifestPatch = resourcePatch(
             "android.permission.ACCESS_ADSERVICES_CUSTOM_AUDIENCE",
         )
 
-        val adMetaValuesToSet = mapOf(
-            "com.google.android.gms.ads.APPLICATION_ID" to "ca-app-pub-0000000000000000~0000000000",
-            "com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" to "true",
-        )
+val adMetaValuesToSet = mapOf(
+    "com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" to "true",
+)
 
         val adMetaNamesToRemove = setOf(
             "com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION",
