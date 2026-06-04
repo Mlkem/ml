@@ -144,7 +144,7 @@ val disableAdRemoteConfigPatch = resourcePatch(
             "GO PREMIUM",
             "Go Premium",
             "Enjoy Six Hours with Zero Ads",
-            "🎁 Six Hours with Zero Ads",
+            "Six Hours with Zero Ads",
             "Enjoy **Six** Hours with **Zero** Ads",
             "Six hours of ad-free gameplay. ~90 seconds",
             "Six hours of ad-free gameplay. ~90 seconds of ads",
