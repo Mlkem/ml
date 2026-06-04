@@ -38,25 +38,10 @@ jobs:
         env:
           GITHUB_ACTOR: Mlkem
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gradle :patches:buildAndroid generatePatchesList --stacktrace
+        run: gradle :patches:buildAndroid --stacktrace
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Upload MPP artifact
+        uses: actions/upload-artifact@v4
         with:
-          node-version: lts/*
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Release
-        uses: cycjimmy/semantic-release-action@v5
-        id: release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Attest
-        if: steps.release.outputs.new_release_published == 'true'
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-name: Morphe Patches ${{ steps.release.outputs.new_release_git_tag }}
-          subject-path: patches/build/libs/patches-*.mpp
+          name: music-league-morphe-patches
+          path: patches/build/libs/*.mpp
