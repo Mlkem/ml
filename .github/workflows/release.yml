@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_ACTOR: Mlkem
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gradle :patches:buildAndroid --stacktrace
+        run: gradle :patches:buildAndroid :patches:generatePatchesList --stacktrace
 
       - name: Upload MPP artifact
         uses: actions/upload-artifact@v4
