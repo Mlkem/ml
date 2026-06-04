@@ -1,1 +1,33 @@
-{ "version": "", "patches": [] }
+{
+  "version": "0.3.0",
+  "patches": [
+    {
+      "name": "Disable Expo updates",
+      "description": "Forces the app to use bundled local assets instead of Expo OTA updates."
+    },
+    {
+      "name": "Pin local Expo config",
+      "description": "Disables Expo update URL/config values in assets/app.config."
+    },
+    {
+      "name": "Disable ad SDK manifest components",
+      "description": "Removes or disables ad SDK manifest components and ad identifier permissions where safe."
+    },
+    {
+      "name": "Neutralize bundled ad unit IDs",
+      "description": "Neutralizes bundled AdMob ad unit IDs while leaving the real AdMob app ID intact."
+    },
+    {
+      "name": "Neutralize premium and reward-ad prompts",
+      "description": "Blanks known premium, rewarded-ad, and ad prompt strings in the Hermes bundle."
+    },
+    {
+      "name": "Disable ad and promo remote config",
+      "description": "Blackholes bundled ad, reward, paywall, and premium-banner remote config keys."
+    },
+    {
+      "name": "Hermes hide ad promo surfaces",
+      "description": "Disabled safety stub. Direct Hermes bytecode modification is not enabled."
+    }
+  ]
+}
