@@ -49,7 +49,14 @@ private fun ByteArray.mlRemoteReplaceText(
     return mlRemoteReplaceBytes(searchBytes, replacementBytes)
 }
 
-private fun mlRemoteBlank(value: String): String = " ".repeat(value.length)
+private fun ByteArray.mlRemoteBlankEncodedText(
+    search: String,
+    charset: Charset,
+): Pair<ByteArray, Int> {
+    val searchBytes = search.toByteArray(charset)
+    val replacementBytes = ByteArray(searchBytes.size) { 0x20.toByte() }
+    return mlRemoteReplaceBytes(searchBytes, replacementBytes)
+}
 
 private fun mlRemoteBlackholeKey(value: String): String {
     return value.map { char ->
@@ -170,13 +177,11 @@ val disableAdRemoteConfigPatch = resourcePatch(
         }
 
         for (text in visiblePromoText) {
-            val replacement = mlRemoteBlank(text)
-
-            val utf8Result = data.mlRemoteReplaceText(text, replacement, Charsets.UTF_8)
+            val utf8Result = data.mlRemoteBlankEncodedText(text, Charsets.UTF_8)
             data = utf8Result.first
             total += utf8Result.second
 
-            val utf16Result = data.mlRemoteReplaceText(text, replacement, Charsets.UTF_16LE)
+            val utf16Result = data.mlRemoteBlankEncodedText(text, Charsets.UTF_16LE)
             data = utf16Result.first
             total += utf16Result.second
         }
