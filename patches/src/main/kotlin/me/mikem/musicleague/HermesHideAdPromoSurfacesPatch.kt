@@ -5,7 +5,7 @@ import app.morphe.patcher.patch.resourcePatch
 @Suppress("unused")
 val hermesHideAdPromoSurfacesPatch = resourcePatch(
     name = "Hermes hide ad promo surfaces",
-    description = "Disabled safety stub. The direct Hermes bytecode patch was removed because it can break app startup.",
+    description = "Disabled safety stub. Direct Hermes bytecode modification caused the app to hang on the intro/loading screen.",
     default = false,
 ) {
     compatibleWith(MUSIC_LEAGUE)
