@@ -107,10 +107,28 @@ val hermesHideAdPromoSurfacesPatch = resourcePatch(
             stringStorageOffset = stringStorageOffset,
         )
 
-        val targetFunctionNames = setOf(
-            "AdsCard",
-            "AdBanner",
-        )
+val targetFunctionNames = setOf(
+    "AdsCard",
+    "AdBanner",
+
+    // Remaining top reward / zero-ads banner.
+    "AdsRewardBanner",
+    "AdRewardBanner",
+    "RewardAdBanner",
+    "RewardedAdBanner",
+    "RewardedAdsBanner",
+    "RewardBanner",
+    "RewardedBanner",
+    "ZeroAdsBanner",
+    "ZeroAdBanner",
+    "AdFreeBanner",
+    "AdFreeRewardBanner",
+    "SixHoursBanner",
+    "SixHoursZeroAdsBanner",
+    "FreeAdsRewardBanner",
+    "PromoBanner",
+    "PremiumBanner",
+)
 
         val patched = original.copyOf()
         val patchedNames = mutableSetOf<String>()
