@@ -1,4 +1,4 @@
-rootProject.name = "music-league-patches-compatible-with-morphe"
+rootProject.name = "mlkem-patches"
 
 pluginManagement {
     repositories {
@@ -17,5 +17,5 @@ pluginManagement {
 }
 
 plugins {
-    id("app.morphe.patches") version "1.3.2"
+    id("app.morphe.patches") version "2.1.0-dev.1"
 }

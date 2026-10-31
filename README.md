@@ -1,245 +1,88 @@
-# Music League patches compatible with Morphe
+# Mlkem Patches
 
-Custom Morphe patch bundle for the Android version of Music League.
+One Morphe source for Music League, Walmart Canada, Wongnai, Zoom Earth, PushPress,
+and the XAPK merge-only utility. The original Music League repository URL is kept
+so existing links, history, and subscriptions continue to work.
 
-## Target inspected APK
+**[Add Mlkem Patches to Morphe](https://morphe.software/add-source?github=Mlkem/ml&name=Mlkem%20Patches)** ·
+[Releases and MPP downloads](https://github.com/Mlkem/ml/releases) ·
+[Report a problem](https://github.com/Mlkem/ml/issues)
 
-* App: Music League
-* Package: `com.musicleague.app`
-* Version name: `1.4.9`
-* Version code: `357`
-* Runtime: Expo / React Native
-* Main app bundle: `assets/index.android.bundle`
-* Bundle type: Hermes JavaScript bytecode
-* Hermes bytecode version: `96`
+## Install and update
 
-## Add to Morphe
+1. Open the **Add to Morphe** link on Android and confirm adding the source.
+   Alternatively add `https://github.com/Mlkem/ml` under **Sources → + → Remote**.
+2. For the new combined collection, enable **Pre-release patches** on this source.
+   The existing stable release is the older Music League-only bundle until the
+   combined collection passes phone testing.
+3. Enable **Experimental app versions** for Walmart Canada and PushPress.
+4. Select the supported original app APK/XAPK, choose patches, patch, and install.
+5. Leave source updates enabled. New published releases arrive through Morphe;
+   tap to repatch/install when an app update is available. Downloading MPP files
+   manually is optional.
 
-Use this source URL in Morphe Manager:
+Keep the same Morphe signing key for future updates over a patched installation.
+If you previously imported one of these bundles as a **local** source, choose
+Mlkem Patches for that app and disable the old source for it to avoid duplicate
+patch selections. Your old download is still available as a backup.
 
-```text
-https://github.com/Mlkem/ml
+## Collection status
+
+| App / utility | Target | Status |
+| --- | --- | --- |
+| Music League | `com.musicleague.app` 1.4.9 | Existing source migrated; combined build awaits phone testing |
+| Walmart Canada | `ca.walmart.ecommerceapp` 26.40 | 1.2.0-beta.1 port; 12 patches; experimental target |
+| Wongnai | `com.wongnai.android` 12.11.0 | Version-specific Google ad fix; phone testing pending |
+| Zoom Earth | `com.neave.zoomearth` 6.1 | Removes injected LiteAPKS/9MOD popup; requires matching modified APK |
+| PushPress Members | `com.pushpress.memberportal` 3.42.0 | CrossFit class selector; experimental target; phone testing pending |
+| Merge XAPK only | Universal | Opt-in no-op that uses Morphe's existing merge/sign flow |
+
+The experimental Music League Hermes bytecode patch is **off by default** because
+startup behavior needs testing. Other Music League patch defaults are preserved.
+Walmart's optional Remove Shop patch and universal Merge XAPK only are also off by default.
+
+## Release channels
+
+- **Beta:** `dev` commits using `feat:` or `fix:` run the build, verify the bundle,
+  and automatically publish a GitHub prerelease and updated source metadata.
+- **Stable:** only after physical-device tests. Stable publication requires a
+  manual Release workflow on main plus a phone-test approval matching the exact
+  current sources. See [phone testing](docs/phone-testing.md).
+- MPP files, release notes, generated patch metadata and previous releases remain
+  available on GitHub. GitHub builds the patch bundle; Morphe patches apps locally.
+
+Selected personal variants are intentionally excluded from this public repository,
+including every public branch and release. A separate private repository is required
+for private source; a branch in this repository is not private.
+
+## Patch catalog
+
+<!-- PATCHES_START -->
+The release workflow generates the full patch catalog here from the built bundle.
+<!-- PATCHES_END -->
+
+## Development
+
+Use JDK 21 and the included Gradle wrapper. Set `GITHUB_ACTOR` and `GITHUB_TOKEN`
+with access to Morphe's package registry, or use local `gpr.user` / `gpr.key` Gradle
+properties. Never commit credentials. GitHub Actions supplies its own scoped token.
+
+```sh
+./gradlew :patches:buildAndroid :patches:generatePatchesList
+python3 scripts/verify_bundle.py
 ```
 
-Or use the add-source link:
-
-```text
-https://morphe.software/add-source?github=Mlkem/ml
-```
-
-## Current patch bundle
-
-This bundle contains patches for Music League’s Android APK.
-
-### Stable patches
-
-1. `Disable Expo updates`
-
-   Changes the Android manifest so Expo OTA updates do not replace patched local code at launch. Also disables Android backup/restore behavior that may restore cached app state.
-
-2. `Pin local Expo config`
-
-   Rewrites `assets/app.config` to remove or disable the Expo update URL and force the app toward the local bundled assets.
-
-3. `Disable ad SDK manifest components`
-
-   Removes or disables ad SDK manifest components and ad identifier permissions where safe.
-
-   Important: this patch must not remove or corrupt the real AdMob application ID. The AdMob app ID uses `~`, for example:
-
-   ```text
-   ca-app-pub-xxxxxxxxxxxxxxxx~xxxxxxxxxx
-   ```
-
-   That app ID must stay valid or the app can fail with publisher configuration errors.
-
-4. `Neutralize bundled ad unit IDs`
-
-   Replaces bundled AdMob ad unit IDs in the Hermes bundle with same-length non-serving placeholders.
-
-   This patch only targets AdMob IDs containing `/`, for example:
-
-   ```text
-   ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx
-   ```
-
-   It intentionally skips app IDs containing `~`.
-
-5. `Neutralize premium and reward-ad prompts`
-
-   Attempts to remove bundled premium, reward-ad, and ad-related prompt text from `assets/index.android.bundle` using same-length text replacement.
-
-   This is a safe string-level patch. It does not modify Hermes opcodes or function bodies.
-
-6. `Disable ad and promo remote config`
-
-   Blackholes known ad, reward, paywall, and premium-banner remote-config keys inside the local Hermes bundle and app config.
-
-   This targets bundled/default config keys such as:
-
-   ```text
-   banner_ads_enabled
-   interstitial_ads_enabled
-   mrec_ads_enabled
-   rewarded_ads_enabled
-   paywall_feature_enabled
-   paywall_modal_config_content
-   ad_reward
-   ads_card_description
-   subscription_headline
-   subscription_subtitle
-   rewarded_headline
-   bannerEnabled
-   rewardedEnabled
-   paywallFeatureEnabled
-   ```
-
-   The goal is to prevent local/default config from enabling premium or ad-promo UI surfaces.
-
-### Disabled safety patch
-
-7. `Hermes hide ad promo surfaces`
-
-   This patch is intentionally disabled by default.
-
-   Direct Hermes bytecode function modification caused the app to hang on the intro/loading screen. It remains in the repo only as a disabled safety stub.
-
-   Do not enable this patch unless the Hermes function mapping has been fully verified.
-
-## Why Expo updates are patched first
-
-The APK has Expo updates enabled in `AndroidManifest.xml`:
-
-* `expo.modules.updates.ENABLED=true`
-* `EXPO_UPDATES_CHECK_ON_LAUNCH=ALWAYS`
-* update URL: `https://u.expo.dev/c0a173c1-8772-4ecc-ab1d-821cd556380d`
-
-Because the real app UI/business logic is inside Hermes bytecode, any local bundle patch can be overwritten by Expo OTA updates unless updates are pinned off first.
-
-## Ad-disable approach
-
-The APK uses a mediated ad stack. The patch approach is intentionally layered:
-
-1. Disable or remove ad SDK manifest components where safe.
-2. Keep the real AdMob app ID intact so the app does not fail startup validation.
-3. Neutralize AdMob ad unit IDs so ad requests cannot use valid placements.
-4. Disable Expo OTA updates so patched local bundle changes are not replaced.
-5. Neutralize bundled ad/premium prompt strings.
-6. Blackhole known ad, reward, and paywall remote-config keys.
-7. Avoid direct Hermes opcode/function patching unless absolutely necessary.
-
-This avoids resizing the Hermes bytecode bundle and reduces the risk of corrupting the app startup path.
-
-## What these patches do not do
-
-These patches do not modify:
-
-* account access
-* paid account entitlements
-* server-side account status
-* licensing
-* authentication
-* app security controls
-* backend behavior
-
-The patches are focused on local APK behavior, ad SDK initialization, ad unit references, local config, Expo update behavior, and bundled UI strings/config keys.
-
-## Build
-
-This follows the Morphe patch template pattern.
-
-Build the Android `.mpp` bundle with:
-
-```bash
-./gradlew :patches:buildAndroid
-```
-
-Expected output:
-
-```text
-patches/build/libs/patches-0.3.0.mpp
-```
-
-The exact file name depends on the `version` value in:
-
-```text
-gradle.properties
-```
-
-Example:
-
-```properties
-version=0.3.0
-```
-
-## Release workflow
-
-If publishing as a Morphe repo source, use the release workflow to generate/update:
-
-```text
-patches-bundle.json
-patches-list.json
-```
-
-These files are used by Morphe Manager when adding the GitHub repository as a source.
-
-Do not manually edit generated release files unless you know exactly what Morphe expects.
-
-## Repo icon
-
-To show a custom icon in Morphe Manager, place a square PNG at the repo root:
-
-```text
-patches-bundle.png
-```
-
-Recommended size:
-
-```text
-512x512 PNG
-```
-
-Correct location:
-
-```text
-.github/
-gradle/
-patches/
-README.md
-gradle.properties
-settings.gradle.kts
-patches-bundle.png
-```
-
-## Testing
-
-Always patch the original APK, not an APK already modified by an earlier failed patch attempt.
-
-Recommended install flow:
-
-```bash
-adb uninstall com.musicleague.app
-adb install patched.apk
-```
-
-If the app behaves strangely after installing a new patched APK, clear data or fully uninstall before reinstalling.
-
-If the app hangs on the intro/loading screen, confirm that `Hermes hide ad promo surfaces` is disabled.
-
-If a publisher configuration error appears, confirm that the AdMob app ID containing `~` was not modified or removed.
-
-## Next patch point
-
-Actual Music League behavior is inside:
-
-```text
-assets/index.android.bundle
-```
-
-That file is Hermes bytecode. For deeper UI/logic changes, the next realistic options are:
-
-1. Replace `assets/index.android.bundle` with a properly rebuilt Hermes bundle from source.
-2. Safely patch bundled config/defaults so ad and premium UI surfaces are never enabled.
-3. Write a verified Hermes bytecode-level patch only after exact function mapping is confirmed.
-
-Normal Java/Kotlin Morphe bytecode fingerprints will mostly hit Expo, React Native, Google, billing, ads, and SDK wrapper code — not the app’s own screen logic.
+Output: `patches/build/libs/patches-<version>.mpp`.
+The alternative `scripts/build_offline.py --help` compiles against supplied official
+Morphe Desktop, Kotlin, Android and R8 jars for local verification.
+
+App patch code lives under `patches/src/main/`; injected code is under `extensions/`.
+See [maintenance](docs/maintenance.md), [source provenance](docs/provenance.md), and
+[app notes](docs/apps/). `sign/` is an existing unrelated page retained unchanged.
+
+## License
+
+GPL-3.0 for the combined collection and template-derived infrastructure. The Wongnai
+component retains its MIT notice. Walmart upstream attribution is preserved in
+[its notice](docs/apps/walmart-NOTICE). This is an independent community project,
+not an official Morphe or app-vendor release.

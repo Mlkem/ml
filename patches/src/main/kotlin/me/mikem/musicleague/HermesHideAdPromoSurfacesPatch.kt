@@ -69,8 +69,8 @@ private fun ByteArray.mlPatchReturnNull(functionOffset: Int) {
 @Suppress("unused")
 val hermesHideAdPromoSurfacesPatch = resourcePatch(
     name = "Hermes hide ad promo surfaces",
-    description = "Safely hides only the remaining ad-card/banner React Native components by making AdsCard and AdBanner return null.",
-    default = true,
+    description = "Experimental Hermes bytecode edit: makes ad-card components return null. May prevent startup; opt in only for testing.",
+    default = false,
 ) {
     compatibleWith(MUSIC_LEAGUE)
 

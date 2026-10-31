@@ -1,69 +1,39 @@
-group = "me.mikem"
+group = "app.template"
 
 patches {
+    // TODO: Update this section with your project details.
     about {
-        name = "Mike's Music League Patches"
-        description = "Private Music League patch bundle for Morphe."
-        source = "https://github.com/Mlkem/ml"
-        author = "Michael MacDonald"
+        name = "UserXYZ Patches"
+        description = "Patches for apps I like"
+        source = "git@github.com:UserXYZ/morphe-patches.git"
+        author = "Awesome dev"
         contact = "na"
         website = "na"
-        license = "Private / personal use"
+        license = "GPLv3"
     }
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-    }
+// Separate configuration so gson is available at runtime for the
+// generatePatchesList task but never bundled into the APK.
+val patchListGeneratorClasspath = configurations.create("patchListGeneratorClasspath")
+
+dependencies {
+    compileOnly(libs.gson)
+    patchListGeneratorClasspath(libs.gson)
 }
 
-tasks.register("generatePatchesList") {
-    description = "Generate patches-list.json for Morphe source indexing."
-    group = "morphe"
+tasks {
+    register<JavaExec>("generatePatchesList") {
+        description = "Build patch with patch list"
 
-    dependsOn("build")
+        dependsOn(build)
 
-    doLast {
-        val output = rootProject.layout.projectDirectory.file("patches-list.json").asFile
-        val version = project.version.toString()
+        classpath = sourceSets["main"].runtimeClasspath + patchListGeneratorClasspath
+        mainClass.set("util.PatchListGeneratorKt")
+    }
 
-        output.writeText(
-            """
-            {
-              "version": "$version",
-              "patches": [
-                {
-                  "name": "Disable Expo updates",
-                  "description": "Forces the app to use bundled local assets instead of Expo OTA updates."
-                },
-                {
-                  "name": "Pin local Expo config",
-                  "description": "Disables Expo update URL/config values in assets/app.config."
-                },
-                {
-                  "name": "Disable ad SDK manifest components",
-                  "description": "Removes or disables ad SDK manifest components and ad identifier permissions where safe."
-                },
-                {
-                  "name": "Neutralize bundled ad unit IDs",
-                  "description": "Neutralizes bundled AdMob ad unit IDs while leaving the real AdMob app ID intact."
-                },
-                {
-                  "name": "Neutralize premium and reward-ad prompts",
-                  "description": "Blanks known premium, rewarded-ad, and ad prompt strings in the Hermes bundle."
-                },
-                {
-                  "name": "Disable ad and promo remote config",
-                  "description": "Blackholes bundled ad, reward, paywall, and premium-banner remote config keys."
-                },
-                {
-                  "name": "Hermes hide ad promo surfaces",
-                  "description": "Disabled safety stub. Direct Hermes bytecode modification is not enabled."
-                }
-              ]
-            }
-            """.trimIndent()
-        )
+    // Used by gradle-semantic-release-plugin.
+    publish {
+        dependsOn("generatePatchesList")
     }
 }
