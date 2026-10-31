@@ -44,7 +44,9 @@ jobs:
           ./gradlew :patches:buildAndroid :patches:generatePatchesList --no-daemon
           python3 scripts/verify_bundle.py
       - name: Restore generated files before semantic release
-        run: git restore patches-list.json
+        run: |
+          git restore patches-list.json
+          rm -f patches/build/libs/*.mpp
       - name: Publish with Morphe semantic-release template
         uses: cycjimmy/semantic-release-action@v8
         id: release
