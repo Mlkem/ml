@@ -1,14 +1,13 @@
-group = "app.template"
+group = "ca.mlkem.patches"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
-        name = "UserXYZ Patches"
-        description = "Patches for apps I like"
-        source = "git@github.com:UserXYZ/morphe-patches.git"
-        author = "Awesome dev"
-        contact = "na"
-        website = "na"
+        name = "Mlkem Patches"
+        description = "Community patches for Music League, Walmart Canada, Wongnai, Zoom Earth, PushPress, and XAPK merging."
+        source = "https://github.com/Mlkem/ml"
+        author = "Mlkem"
+        contact = "https://github.com/Mlkem/ml/issues"
+        website = "https://github.com/Mlkem/ml"
         license = "GPLv3"
     }
 }
