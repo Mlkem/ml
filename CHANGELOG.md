@@ -1,0 +1,14 @@
+## 1.0.0-dev.1 (2026-11-02)
+
+### ✨ New Features
+
+* consolidate public patches with automatic beta releases ([b379a26](https://github.com/Mlkem/ml/commit/b379a26c732820022fea0da25f5e7dcff0a1b5e7))
+
+### 🐛 Bug Fixes
+
+* align Java patch compilation with Kotlin JVM target ([7d0cf81](https://github.com/Mlkem/ml/commit/7d0cf81ef0eda0b73b89c6dc20d7178ae977ace9))
+* configure bundle metadata in the patches module ([87c5f4b](https://github.com/Mlkem/ml/commit/87c5f4b4cc6c7c3e02dc272605bf7bb36e86f761))
+* simplify release workflow ([1823eee](https://github.com/Mlkem/ml/commit/1823eee9c2881c6239ee06b32dc3b80547f33be3))
+* supply PushPress manifest and isolate versioned release output ([86bae10](https://github.com/Mlkem/ml/commit/86bae1059e45024f33b0d7b5e39039cc6aa95ce6))
+* use installed gradle in release workflow ([5c14488](https://github.com/Mlkem/ml/commit/5c14488f81b432a821f9fa3abd407f7e2976ca3b))
+* verify executable bundle separately from documentation archives ([ce2b55b](https://github.com/Mlkem/ml/commit/ce2b55b620c216452a7be92c6ae724b5ea8e782b))

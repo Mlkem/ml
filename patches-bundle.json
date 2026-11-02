@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-06-04T00:00:00Z",
-  "description": "Mike's Music League Patches",
-  "download_url": "https://github.com/Mlkem/ml/releases/download/ML-Morphe/patches-0.3.0.mpp",
+  "created_at": "2026-11-02T11:24:52",
+  "description": "## 1.0.0-dev.1 (2026-11-02)\n\n### ✨ New Features\n\n* consolidate public patches with automatic beta releases ([b379a26](https://github.com/Mlkem/ml/commit/b379a26c732820022fea0da25f5e7dcff0a1b5e7))\n\n### 🐛 Bug Fixes\n\n* align Java patch compilation with Kotlin JVM target ([7d0cf81](https://github.com/Mlkem/ml/commit/7d0cf81ef0eda0b73b89c6dc20d7178ae977ace9))\n* configure bundle metadata in the patches module ([87c5f4b](https://github.com/Mlkem/ml/commit/87c5f4b4cc6c7c3e02dc272605bf7bb36e86f761))\n* simplify release workflow ([1823eee](https://github.com/Mlkem/ml/commit/1823eee9c2881c6239ee06b32dc3b80547f33be3))\n* supply PushPress manifest and isolate versioned release output ([86bae10](https://github.com/Mlkem/ml/commit/86bae1059e45024f33b0d7b5e39039cc6aa95ce6))\n* use installed gradle in release workflow ([5c14488](https://github.com/Mlkem/ml/commit/5c14488f81b432a821f9fa3abd407f7e2976ca3b))\n* verify executable bundle separately from documentation archives ([ce2b55b](https://github.com/Mlkem/ml/commit/ce2b55b620c216452a7be92c6ae724b5ea8e782b))",
+  "download_url": "https://github.com/Mlkem/ml/releases/download/v1.0.0-dev.1/patches-1.0.0-dev.1.mpp",
   "signature_download_url": "",
-  "version": "0.3.0"
+  "version": "1.0.0-dev.1"
 }
