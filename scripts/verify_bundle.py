@@ -15,7 +15,8 @@ for p in patches:
     for c in p.get('compatiblePackages') or []:
         if c['packageName'] in {'ca.walmart.ecommerceapp','com.pushpress.memberportal'}:
             assert all(t['isExperimental'] for t in c['targets']), 'Unverified target must stay experimental'
-bundles=[p for p in (root/'patches/build/libs').glob('*.mpp') if '-sources' not in p.name]
+bundles=[p for p in (root/'patches/build/libs').glob('*.mpp')
+         if '-sources' not in p.name and '-javadoc' not in p.name]
 assert bundles, 'No MPP generated'
 for p in bundles:
     with zipfile.ZipFile(p) as z:
