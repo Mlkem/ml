@@ -1,5 +1,14 @@
 group = "ca.mlkem.patches"
 
+// Match Kotlin's JVM 11 target when compiling Java patch entry points on JDK 21.
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(11)
+}
+
 patches {
     about {
         name = "Mlkem Patches"
