@@ -1,0 +1,86 @@
+name: PS5 Ocarina test build (isolated)
+on:
+  push:
+    branches:
+      - ps5-oot-903-build-20261117
+    paths:
+      - 'ps5/ocarina/**'
+      - '.github/workflows/ps5-oot-903.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 355
+    env:
+      CCACHE_MAXSIZE: 4G
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out isolated test patch
+        uses: actions/checkout@v4
+      - name: Free runner disk space
+        run: |
+          df -h .
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL /opt/hostedtoolcache/go /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk /opt/hostedtoolcache/PyPy /opt/hostedtoolcache/Ruby
+          df -h .
+      - name: Fetch pinned EglantinePS5 upstream source
+        run: |
+          git clone --filter=blob:none https://github.com/heydemoura/EglantinePS5.git source
+          cd source
+          git checkout --detach 3d5b3d70ed3f19b746a1907f8bdde02c496b2ece
+          git rev-parse HEAD
+      - name: Apply crash fix and verify
+        run: |
+          cd source
+          git apply --check ../ps5/ocarina/nx2-gsv-903.patch
+          git apply ../ps5/ocarina/nx2-gsv-903.patch
+          git diff --check
+          git diff --stat
+          grep -F '{903, &INx2GraphicsSystemSession::Stub' Eglantine/src/core/hle/service/nx2_gsv.h
+      - name: Configure build cache and dependencies
+        run: |
+          cache_root="$(dirname "$GITHUB_WORKSPACE")/ps5-cache"
+          mkdir -p "$cache_root"
+          echo "CACHE_ROOT=$cache_root" >> "$GITHUB_ENV"
+          echo "RADV_NATIVE=$(dirname "$GITHUB_WORKSPACE")/mihawk-vulkan-review/.deps/native" >> "$GITHUB_ENV"
+          echo "RADV_WORK=$(dirname "$GITHUB_WORKSPACE")/mihawk-vulkan-review/.deps/work" >> "$GITHUB_ENV"
+          echo "EGLANTINEPS5_DEPS_CACHE=$cache_root/downloads" >> "$GITHUB_ENV"
+          echo "CCACHE_DIR=$cache_root/ccache" >> "$GITHUB_ENV"
+          echo "XDG_CACHE_HOME=$cache_root/xdg" >> "$GITHUB_ENV"
+          echo "SPIRV_TRANSLATOR=$cache_root/spirv-llvm-translator" >> "$GITHUB_ENV"
+          echo "JOBS=$(nproc)" >> "$GITHUB_ENV"
+          echo "RADV_BUILD_JOBS=$(nproc)" >> "$GITHUB_ENV"
+      - name: Restore PS5 dependency cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.CACHE_ROOT }}/downloads
+            ${{ env.CACHE_ROOT }}/ccache
+            ${{ env.SPIRV_TRANSLATOR }}
+          key: ps5-oot-build-${{ hashFiles('ps5/ocarina/nx2-gsv-903.patch') }}
+          restore-keys: |
+            ps5-oot-build-
+      - name: Install upstream toolchain
+        working-directory: source
+        run: |
+          bash tools/ci/setup-ubuntu-24.04.sh "$SPIRV_TRANSLATOR" 3>> "$GITHUB_ENV"
+          make toolchain
+      - name: Build patched PS5 app
+        working-directory: source
+        timeout-minutes: 315
+        run: |
+          make deps
+          bash tools/ci/build-release.sh
+      - name: Upload exact patched PS5 build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EglantinePS5-Ocarina-903-test
+          path: source/dist/EglantinePS5-v*.zip
+          if-no-files-found: error
+          retention-days: 7
