@@ -1,0 +1,12 @@
+--- a/Eglantine/src/core/hle/service/nx2_gsv.h
++++ b/Eglantine/src/core/hle/service/nx2_gsv.h
+@@ -3493,6 +3493,9 @@
+              "CalculateDecoderImagePoolBuffer"},
+             {901, &INx2GraphicsSystemSession::Stub, "VideoInitialize (guessed)"},
+             {902, &INx2GraphicsSystemSession::OpenVideoSession, "OpenVideoDecoderSession (guessed)"},
++            // Ocarina of Time 2.0.0 sends TIPC 903 when closing its video server.
++            // Reply success, matching the video-group initialize/finalize control calls.
++            {903, &INx2GraphicsSystemSession::Stub, "VideoFinalize (guessed)"},
+             {905, &INx2GraphicsSystemSession::OpenVideoSession, "OpenVideoDecoderSessionWithFlag"},
+             {906, &INx2GraphicsSystemSession::OpenVideoSession, "OpenVideoDecoderSessionWithVersion"},
+             {1001, &INx2GraphicsSystemSession::Stub, "VideoInitialize2 (guessed)"},
